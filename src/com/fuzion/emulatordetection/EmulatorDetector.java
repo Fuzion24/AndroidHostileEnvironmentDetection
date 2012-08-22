@@ -6,10 +6,15 @@ public class EmulatorDetector {
 		System.loadLibrary("emudetect");
 	}
 	
-	public native static void detectEmulator();
+	public native static double detectEmulator();
 	
-	static void testNative()
+	static boolean isEmulator()
 	{
-		detectEmulator();
+		double entValue = detectEmulator();
+
+		if(entValue < 0.05)
+			return true;
+		
+		return false;
 	}
 }
