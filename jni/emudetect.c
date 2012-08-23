@@ -1,17 +1,3 @@
-// Copyright (C) 2012 thuxnder@dexlabs.org
-// Based on the x86 version of pleed@dexlabs.org
-//
-// Licensed under the Apache License, Version 2.0 (the 'License');
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an 'AS IS' BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 /*
 	A physical CPU increases the program counter after each instruction such that the
 	program counter is always up to date. Since the registers in the translated code are emulated
@@ -24,7 +10,6 @@
 	in the virtual CPU register as part of an optimization. As a consequence the
 	virtual program counter often just points to the start of a basic block since it
 	is updated after every branch.
-
 */
 
 #include <sched.h>
@@ -47,7 +32,7 @@ double calculatEntropyValue();
 uint32_t * histogram;
 uint32_t global_value = 0;
 const int numberOfIncIns = 50;
-int numberOfSamples = 0x1000;//Make sure we dont overflow any entry of our histogram by using UINT_MAX
+int numberOfSamples = 0x100;//Make sure we dont overflow any entry of our histogram by using UINT_MAX
 
 void polling_thread(void){
 	int i = 0;
@@ -146,11 +131,11 @@ void initializeHistogram(){
 	//so we know that we will have an index into histogram greater than numberOfIncIns
 	histogram = malloc(sizeof(uint32_t) * (numberOfIncIns));
 	int i;
-	for(i =0; i<numberOfIncIns; i++)
+	for(i =0; i < numberOfIncIns; i++)
 		histogram[i] = 0;
 }
 
-jdouble Java_com_fuzion_emulatordetection_EmulatorDetector_detectEmulator(JNIEnv* env, jobject javaThis) {
+jdouble Java_com_fuzion_emulatordetection_EmulatorDetector_qemuFingerPrint(JNIEnv* env, jobject javaThis) {
 	initializeHistogram();
 
 	pthread_t threadData;
