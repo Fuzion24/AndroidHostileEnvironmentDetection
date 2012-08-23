@@ -30,7 +30,12 @@ void* atomicallyIncreasingGlobalVarThread(void *);
 void printHistogram();
 double calculatEntropyValue();
 uint32_t * histogram;
-uint32_t global_value = 0;
+#ifdef __amd64__
+	uint64_t global_value = 0;
+#else
+	uint32_t global_value = 0;
+#endif
+
 const int numberOfIncIns = 50;
 int numberOfSamples = 0x100;//Make sure we dont overflow any entry of our histogram by using UINT_MAX
 
@@ -49,7 +54,48 @@ void polling_thread(void){
 
 void* atomicallyIncreasingGlobalVarThread(void * data){
 	for(;;){
-		__asm__ __volatile__ ("mov r0, %[global];"
+
+		#ifdef __amd64__
+			__asm__ __volatile__ ( "mov %0, %%rbx;"
+				"movl $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"     "add $1, (%%rbx);"
+				"add $1, (%%rbx);"
+				:
+				:"c"(&global_value)
+				);
+		#endif
+		#ifdef __arm__
+			__asm__ __volatile__ ("mov r0, %[global];"
 		                      "mov r1, #1;"
 		                      "add r1, r1, #1;" "str r1, [r0];"
 		                      "add r1, r1, #1;" "str r1, [r0];"
@@ -102,6 +148,46 @@ void* atomicallyIncreasingGlobalVarThread(void * data){
 		                      :
 		                      :[global] "r" (&global_value)
 		                      );
+		#endif
+		#ifdef __i386__
+			__asm__ __volatile__ (
+				"movl %0, %%ebx;"
+				"movl $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				"add $1, (%%ebx);"
+				:
+				:"c"(&global_value)
+				);
+		#endif
 	}
 }
 
@@ -129,7 +215,11 @@ void printHistogram(){
 void initializeHistogram(){
 	//Assume that we have ~numberOfIncIns asm increment instructions
 	//so we know that we will have an index into histogram greater than numberOfIncIns
-	histogram = malloc(sizeof(uint32_t) * (numberOfIncIns));
+	#ifdef __amd64__
+		histogram = malloc(sizeof(uint64_t) * (numberOfIncIns));
+	#else
+		histogram = malloc(sizeof(uint32_t) * (numberOfIncIns));
+	#endif
 	int i;
 	for(i =0; i < numberOfIncIns; i++)
 		histogram[i] = 0;

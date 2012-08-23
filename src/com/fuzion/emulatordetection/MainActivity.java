@@ -19,8 +19,10 @@ public class MainActivity extends Activity {
         btnClicky.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-					Log.d("EMU","OnClick");
-				 EmulatorDetector.qemuDetection();
+				 if(EmulatorDetector.qemuDetection())
+					 Log.d("EMUDETECT", "I know you're running on an emulator, so I am not going to do anything malicious");
+				 else
+					 Log.d("EMUDETECT", "OK, we're on a real device, here's my malicious payload");
 			}
         }); 
     }
