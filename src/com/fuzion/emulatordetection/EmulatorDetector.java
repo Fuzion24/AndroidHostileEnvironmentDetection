@@ -1,5 +1,11 @@
 package com.fuzion.emulatordetection;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.lang.reflect.Method;
+
+import android.content.Context;
 import android.util.Log;
 
 public class EmulatorDetector {
@@ -10,7 +16,19 @@ public class EmulatorDetector {
 
 	private native static double qemuFingerPrint();
 
-	static boolean qemuDetection()
+	public static boolean shouldBail(Context ctx){
+		if(
+			qemuAtomicBasicBlockDetection()||
+			qemuBuildProps(ctx) ||
+			cpuInfoIsQemu() ||
+			qemuFileExistance() ||
+			isNotUserBuild(ctx)
+			) return true;
+		
+		return false;
+				
+	}
+	public static boolean qemuAtomicBasicBlockDetection()
 	{
 
 	/*
@@ -32,4 +50,59 @@ public class EmulatorDetector {
 	
 		return entValue < 0.05 ? true : false;
 	}
+	
+	public static boolean qemuBuildProps(Context ctx){
+		
+		if(
+			"goldfish".equals(getProp(ctx,"ro.hardware")) || 
+		    "generic".equals(getProp(ctx,"ro.product.device")) || 
+		    "1".equals(getProp(ctx,"ro.kernel.qemu")) 
+		   )
+			return true;
+
+		return false;
+	}
+	
+	public static boolean isNotUserBuild(Context ctx){
+		//Other builds of android that are not production usually have build types of "eng", "debug", etc... 
+		//Although this doesn't denote having an emulator, there is a possibility that the user is more intelligent
+		//than a normal Android user and thus increases the risk of getting caught .. avoid that situation
+
+		return !getProp(ctx,"ro.build.type").equals("user");
+	}
+
+	public static boolean cpuInfoIsQemu(){
+		try{
+			BufferedReader cpuInfoReader = new BufferedReader(new FileReader("/proc/cpuinfo"));
+			String line;
+			while((line = cpuInfoReader.readLine()) != null){
+				if(line.contains("Goldfish"))
+					return true;
+			}
+		}catch(Exception e){}
+		return false;
+	}
+	
+	public static boolean qemuFileExistance(){
+		if (
+				(new File("/init.goldfish.rc")).exists() || 
+				(new File("/sys/qemu_trace")).exists() 	
+			)
+			return true;
+		
+		return false;
+	}
+	private static String getProp(Context ctx, String propName){
+		try{
+			ClassLoader cl = ctx.getClassLoader();
+			Class<?> AndroidOSProps = cl.loadClass("android.os.properties");
+			Method getProp = AndroidOSProps.getMethod("get", String.class);
+			Object[] params = {new String(propName)};
+			return (String) getProp.invoke(AndroidOSProps, params);
+		}catch(Exception e){
+			e.printStackTrace();
+			return "";
+		}
+	}
+	
 }
