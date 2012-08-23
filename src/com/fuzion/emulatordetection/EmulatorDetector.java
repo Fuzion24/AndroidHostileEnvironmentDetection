@@ -22,12 +22,14 @@ public class EmulatorDetector {
 			qemuBuildProps(ctx) ||
 			cpuInfoIsQemu() ||
 			qemuFileExistance() ||
-			isNotUserBuild(ctx)
+			isNotUserBuild(ctx) || 
+			hasEth0Interface()
 			) return true;
 		
 		return false;
 				
 	}
+	
 	public static boolean qemuAtomicBasicBlockDetection()
 	{
 
@@ -51,6 +53,11 @@ public class EmulatorDetector {
 		return entValue < 0.05 ? true : false;
 	}
 	
+	public static boolean hasEth0Interface(){
+		//Normal devices have no eth0 interface, check if that interface exists and bail
+		//TODO: implement this
+		return false;
+	}
 	public static boolean qemuBuildProps(Context ctx){
 		
 		if(
