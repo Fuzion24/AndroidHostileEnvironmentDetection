@@ -52,7 +52,7 @@ public class EmulatorDetector {
 	
 		return entValue < 0.05 ? true : false;
 	}
-	
+
 	public static boolean hasEth0Interface(){
 		//Normal devices have no eth0 interface, check if that interface exists and bail
 		//TODO: implement this
@@ -99,6 +99,7 @@ public class EmulatorDetector {
 		
 		return false;
 	}
+
 	private static String getProp(Context ctx, String propName){
 		try{
 			ClassLoader cl = ctx.getClassLoader();
