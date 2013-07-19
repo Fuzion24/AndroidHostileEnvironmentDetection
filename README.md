@@ -2,7 +2,7 @@ Android Emulator Detection
 ========================
 
 Contains many different ways to identify hostile environments. This project is an android application that uses various techniques to identify the environment that it is currently running in. 
-It borrows code and extends the idea offered up by BlueBox [here](http://www.dexlabs.org/blog/btdetect)
+It borrows code and extends the idea offered up by BlueBox (here)[http://www.dexlabs.org/blog/btdetect]
 
 There was a great presentation by Oberheide and Miller with their experience poking around the emulator. This project borrows and implements ideas from it as well. (Bouncer)[http://jon.oberheide.org/files/summercon12-bouncer.pdf]
 
