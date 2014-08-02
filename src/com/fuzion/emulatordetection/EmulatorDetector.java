@@ -55,7 +55,13 @@ public class EmulatorDetector {
 
 	public static boolean hasEth0Interface(){
 		//Normal devices have no eth0 interface, check if that interface exists and bail
-		//TODO: implement this
+		try {
+			for(Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+			  NetworkInterface intf = en.nextElement();
+			  if(intf.getName().equals("eth0"))
+			  	return true;
+			}
+		} catch (SocketException ex) { }
 		return false;
 	}
 	public static boolean qemuBuildProps(Context ctx){
