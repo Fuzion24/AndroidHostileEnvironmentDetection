@@ -1,4 +1,4 @@
-Android Emulator Detection
+Android Hostile Environment Detection
 ========================
 
 Contains many different ways to identify hostile environments. This project is an android application that uses various techniques to identify the environment that it is currently running in. 
